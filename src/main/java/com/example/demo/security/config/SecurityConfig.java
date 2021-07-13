@@ -1,5 +1,8 @@
-package com.example.demo.config;
+package com.example.demo.security.config;
 
+import com.example.demo.security.handler.CustomAuthenticationFailureHandler;
+import com.example.demo.security.handler.CustomAuthenticationSuccessHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,13 +18,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -42,6 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .formLogin().loginPage("/login").permitAll()
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
                 .and()
                 .addFilterBefore(customFilterInterceptor(),FilterSecurityInterceptor.class);
 
